@@ -1,0 +1,4 @@
+.venv-1/
+thesis.egg-info/
+__pycache__/
+.ipynb_checkpoints/
