@@ -21,13 +21,14 @@ def bond_sorter(bonds, n):  # try and work out if possible to do this without ne
     """
     Sorts bonds by rank order
     """
+    
     ranks = []
     for pi in bonds:
         ranks.append(n - len(pi))
 
     return [x for _, x in sorted(zip(ranks, bonds))]
 
-def bond_finder(G):
+def brute_force_bond_finder(G):
 
     """
     Finds all vertex partitions that define bonds of the graph G
@@ -44,3 +45,6 @@ def bond_finder(G):
             bonds.append(p) # turn blocks and partitions into sets and sort
     
     return bond_sorter(bonds, G.number_of_nodes())
+
+
+

@@ -1,4 +1,4 @@
-from bond_finder import bond_finder
+from bond_finder import brute_force_bond_finder
 import numpy as np
 
 # Needed for well-defined set inclusion for partitions
@@ -51,7 +51,7 @@ def full_inv_mu_graph(G):
         For a specified graph G, finds the bonds ordered by refinement, calculates the zeta matrix, calculates the moebius
         matrix by inversion, extracts the required moebius coefficients
     """
-    bonds = bond_finder(G)
+    bonds = brute_force_bond_finder(G)
 
     return full_inv_mu(bonds)
 
@@ -75,6 +75,6 @@ def mat_vec_mu_graph(G):
         moebius coefficients by a matrix-vector solve.
     """
 
-    bonds = bond_finder(G)
+    bonds = brute_force_bond_finder(G)
 
     return mat_vec_solve_mu(bonds)
