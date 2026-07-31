@@ -4,7 +4,7 @@ import more_itertools as mit
 def bond_checker(partition, G):
 
     """
-    Checks whether a given partition of vertices of a graph G defines a bond
+        Checks whether a given partition of vertices of a graph G defines a bond
     """
 
     for block in partition:
@@ -19,19 +19,16 @@ def bond_checker(partition, G):
 def bond_sorter(bonds, n):  # try and work out if possible to do this without needing n input, purely working out number of nodes n from the bonds
     
     """
-    Sorts bonds by rank order
+        Sorts bonds by rank (number of blocks) order
     """
     
-    ranks = []
-    for pi in bonds:
-        ranks.append(n - len(pi))
-
-    return [x for _, x in sorted(zip(ranks, bonds))]
+    return sorted(bonds, key=lambda pi: n - len(pi))
 
 def brute_force_bond_finder(G):
 
     """
-    Finds all vertex partitions that define bonds of the graph G
+        Finds all vertex partitions that define bonds of the graph G. Does this by brute force,
+        computing every possible partition of the set and checking whether this defines a bond
     """
 
     # All partitions of the vertices
@@ -42,7 +39,7 @@ def brute_force_bond_finder(G):
     for p in partitions:
         verdict = bond_checker(p, G)
         if verdict == True:
-            bonds.append(p) # turn blocks and partitions into sets and sort
+            bonds.append(frozenset(frozenset(block) for block in p)) # turn blocks and partitions into sets and sort
     
     return bond_sorter(bonds, G.number_of_nodes())
 
