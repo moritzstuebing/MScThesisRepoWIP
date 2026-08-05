@@ -134,7 +134,8 @@ def factorised_bi(G, algo, rho):
         calculates for bond factorisations, then non-bond factorisations.
     """
 
-    bonds, partitions, sep_list = bond_nonbond_list_maker(G, algo)
+    d = len(G.nodes)
+    bonds, _, sep_list = bond_nonbond_list_maker(G, algo)
 
     bond_facts = {}
     nonbond_facts = {}
@@ -144,7 +145,7 @@ def factorised_bi(G, algo, rho):
 
         # Covariance to induce joint factorisation according to current bond. Correlation strength between 
         # dependent variables = 0.99
-        sigma = covariance_matrix_bond(4, bond, rho)
+        sigma = covariance_matrix_bond(d, bond, rho)
 
         # Calculate and append
         bond_facts[bond] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
@@ -153,7 +154,7 @@ def factorised_bi(G, algo, rho):
 
         # Covariance to induce joint factorisation according to current bond. Correlation strength between 
         # dependent variables = 0.99
-        sigma = covariance_matrix_bond(4, part, rho)
+        sigma = covariance_matrix_bond(d, part, rho)
         
                 # Calculate and append
         nonbond_facts[part] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
