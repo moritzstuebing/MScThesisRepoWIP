@@ -153,9 +153,9 @@ def factorised_bi(G, algo, rho):
 
         # Covariance to induce joint factorisation according to current bond. Correlation strength between 
         # dependent variables = 0.99
-        sigma = covariance_matrix_bond(4, bond, rho)
+        sigma = covariance_matrix_bond(4, part, rho)
         
-        # Calculate and append
+                # Calculate and append
         nonbond_facts[part] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
 
     return bond_facts, nonbond_facts
