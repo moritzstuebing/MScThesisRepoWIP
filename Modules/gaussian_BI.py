@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 import itertools
 from Modules.brute_force_bond_finder import brute_force_bond_finder
 from Modules.moebius_machinery import mat_vec_solve_mu
@@ -92,7 +93,6 @@ def analytic_gaussian_bi(G, algo, sigma, alpha=0.5):
 
     # Get bonds and moebius coefficients
     bonds = algo(G)
-    d = len(bonds[0])
     _, _, mu = mat_vec_solve_mu(bonds)
 
     # Initialise running sum
@@ -105,3 +105,60 @@ def analytic_gaussian_bi(G, algo, sigma, alpha=0.5):
         sum += mu[i] * ((div - 1.0) / (alpha - 1.0))
 
     return sum
+
+def bond_nonbond_list_maker(G, algo):
+
+    """
+        This is a function to sort the list of partitions for a d-vertex graph into bonds and non-bonds
+        of the graph G.
+    """
+
+    d = len(G.nodes)
+    partitions = algo(nx.complete_graph(d))
+    bonds = algo(G)
+
+    # Initiate separated set with all the bonds of C_4
+    sep_list = [bond for bond in bonds]
+
+    # Now append non-bond partitions
+    for partition in partitions:
+        if partition not in bonds:
+            sep_list.append(partition)
+
+    return bonds, partitions, sep_list
+
+def factorised_bi(G, algo):
+
+    """
+        Calculates the Bond Information for all factorisations of the joint distribution. First
+        calculates for bond factorisations, then non-bond factorisations.
+    """
+
+    bonds, partitions, sep_list = bond_nonbond_list_maker(G, algo)
+
+    bond_informations = {}
+
+    # Calculate bond informations
+    for bond in sep_list:
+
+        # Covariance to induce joint factorisation according to current bond. Correlation strength between 
+        # dependent variables = 0.99
+        sigma = covariance_matrix_bond(4, bond, 0.99)
+
+        # Calculate and append
+        bond_informations[bond] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
+
+    return bond_informations
+
+
+def bond_to_label(bond, offset=1):
+
+    """
+        Generates LaTeX label from bond given as a frozenset of frozensets
+    """
+    blocks = sorted(
+        (sorted(v + offset for v in block) for block in bond),
+        key=lambda b: b[0],
+    )
+    body = "".join("P_{" + "".join(map(str, b)) + "}" for b in blocks)
+    return "$" + body + "$"
