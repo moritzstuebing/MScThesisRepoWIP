@@ -99,7 +99,13 @@ def restrict(sigma, bond):
         given bond.
 
         Inputs:
-        sigma
+        sigma - covariance matrix (2D np.array) encoding overall dependence structure of the 
+                joint distribution to be further factorised according to bond. 
+        bond - the bond according to which the joint distribution should be further factorised
+                according to.
+
+        Outputs:
+        sigma_bond - the covariance matrix that has been further factorised according to the bond.
     """
 
     # Copy to prevent overwriting
@@ -240,15 +246,22 @@ def factorised_bi(G, algo, rho):
     return bond_facts, nonbond_facts
 
 
-def bond_to_label(bond, offset=1):
+def bond_to_label(bond):
 
     """
-        Generates LaTeX label from bond given as a frozenset of frozensets
+        Generates LaTeX label from bond given as a frozenset of frozensets.
+
+        Inputs:
+        bond - the bond to be displayed (frozenset of frozensets).
+
+        Outputs:
+        a nice string displaying the factorisation of the joint distribution.
+
     """
 
     # Sort the blocks in order of the first element in each block
     blocks = sorted(
-        (sorted(v + offset for v in block) for block in bond),
+        (sorted(v + 1 for v in block) for block in bond),
         key= min,
     )
     body = "".join("P_{" + "".join(map(str, b)) + "}" for b in blocks)
