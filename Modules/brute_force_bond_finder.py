@@ -1,20 +1,51 @@
 import networkx as nx
 import more_itertools as mit
 
-def bond_checker(partition, G):
+def bond_checker(G, partition):
 
     """
-        Checks whether a given partition of vertices of a graph G defines a bond
+        Checks whether a given partition of vertices of a graph defines a bond.
+
+        Inputs:
+        partition - candidate partition of graph vertices to be checked, frozenset of frozensets
+        G - graph to check the candidate partition in (NetworkX graph object).
+
+        Outputs:
+        True/False depending on whether partition is a bond or not.
     """
 
+    # Loop over blocks in the partition
     for block in partition:
+
+        # Check if the induced subgraph of the block is connected
         subgraph = nx.subgraph(G, block)
         if nx.is_connected(subgraph) == True:
             continue
         else:
             return False
 
+    # If all blocks induce connected subgraphs, return True
     return True
+
+def bond_viewer(bond):
+
+    """
+        Takes the bond as a frozenset of frozensets and outputs it in a nice format.
+
+        Inputs:
+        bond - bond partition as frozenset of frozensets.
+
+        Outputs:
+        prints the bond in the nice format, just numbers with midlines separating the blocks.
+    """
+
+    blocks = sorted(bond, key=min)
+    formatted = " | ".join(
+        " ".join(str(v) for v in sorted(block))
+        for block in blocks
+    )
+    print(formatted)
+
 
 def bond_sorter(bonds, n):  # try and work out if possible to do this without needing n input, purely working out number of nodes n from the bonds
     
@@ -24,7 +55,11 @@ def bond_sorter(bonds, n):  # try and work out if possible to do this without ne
     
     return sorted(bonds, key=lambda pi: n - len(pi))
 
-def brute_force_bond_finder(G):
+def sort_key(bond):
+    blocks = sorted(sorted(block) for block in bond)
+    return (-len(blocks), blocks)
+
+def brute_force_bond_finder(G, nice_format_view=False):
 
     """
         Finds all vertex partitions that define bonds of the graph G. Does this by brute force,
@@ -37,11 +72,16 @@ def brute_force_bond_finder(G):
     # Loop through all set partitions, check they are bonds, add to list of bonds if so
     bonds = []
     for p in partitions:
-        verdict = bond_checker(p, G)
+        verdict = bond_checker(G, p)
         if verdict == True:
-            bonds.append(frozenset(frozenset(block) for block in p)) # turn blocks and partitions into sets and sort
-    
-    return bond_sorter(bonds, G.number_of_nodes())
+            bonds.append(frozenset(frozenset(block) for block in p)) # turn blocks and partitions into frozenset of frozensets
+            
+    if nice_format_view == True:
+        for bond in sorted(bonds, key=sort_key):
+            bond_viewer(bond)
+
+    else:
+        return bond_sorter(bonds, G.number_of_nodes())
 
 
 

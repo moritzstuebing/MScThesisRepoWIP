@@ -20,7 +20,16 @@ def shuffle_data(data, shuffle_indices):
 def div_simplifier(bond):
 
     """
-        Simplifies the argument of the divergence by cancelling singleton indices appearing in both numerator and denominator.
+        Simplifies the argument of the divergence by cancelling singleton indices appearing in
+        both numerator and denominator.
+
+        Inputs:
+        bond - a frozenset of frozensets defining the vertex blocks of the bond partition
+
+        Outputs:
+        numerator - non-singleton blocks of the bond partition, frozenset of frozensets
+        denominator - singleton blocks of only vertices appearing in blocks of the numerator,
+                        frozenset of frozensets
     """
 
     numerator = []
@@ -37,13 +46,14 @@ def div_simplifier(bond):
 def bond_information(G, X, div, algo):
     
     """
-        Calculates the bond information for a given graph G, dataset X, divergence measure div, and bond finding algorithm algo.
+        Calculates the bond information from a dataset and graph prior.
+
+        Inputs:
+        G - graph structure of the data (NetworkX graph object)
+        X - dataset
     """
 
-    # Retrieve all bonds of the graph and initialise array for divergence storing
-    #bonds = algo(G)
-
-    # Calculate the mu coefficients of the given graph
+    # Retreive bonds and calculate the mu coefficients of the given graph
     bonds, _, mu = mat_vec_mu_graph(G, algo)
     divs = np.zeros(len(bonds))
 
