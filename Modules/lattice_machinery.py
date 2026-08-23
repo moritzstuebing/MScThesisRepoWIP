@@ -6,8 +6,14 @@ from Modules.brute_force_bond_finder import brute_force_bond_finder, bond_sorter
 def partition_entropy(partition):
 
     """
-        Computes the entropy of a partition, given as frozenset of frozensets. Used for
-        creating weighted Hasse diagrams used in BVI computation.
+        Computes the entropy of a partition. Used for creating weighted Hasse diagrams used in
+        BVI computation.
+
+        Inputs:
+        partition - the partition of variables (frozenset of frozensets)
+
+        Outputs:
+        entropy - the partition entropy
     """
     
     # List for block sizes
@@ -25,7 +31,14 @@ def cover_check(pi, sigma):
 
     """
         Checks whether sigma covers pi by checking that sigma is obtained from pi by merging 
-        exactly two blocks
+        exactly two blocks.
+
+        Inputs:
+        pi - the bond partition to check for being covered (frozenset of frozensets)
+        sigma - the bond partition to check for covering pi (frozenset of frozensets)
+
+        Outputs:
+        True/False depending on if sigma covers pi or not
     """
 
     # Checks if number of blocks match the cover relation
@@ -53,31 +66,38 @@ def cover_check(pi, sigma):
                     verdict = check_1 and all(check_2)
                     verdicts.append(verdict)
 
+    # Only returns true if strictly one such pair of blocks exists
     if sum(verdicts) == 1:
         return True
 
     else:
         return False
 
-def hasse_creator(G, weight=False):
+def hasse_creator(G, algo, weight=False):
 
     """
-        Constructs the Hasse diagram of the bond lattice of G using NetworkX. Passing weight=True
-        forms the weighted Hasse diagram with the entropy edges. Used for BVI calculation.
+        Constructs the Hasse diagram of the bond lattice of G. Used for BVI calculation.
+
+        Inputs:
+        G - the graph (NetworkX object)
+        algo - the chosen bond-finding algorithm
+        weight - whether or not to include edge weights given by the entropy differences
     """
 
-    bonds = brute_force_bond_finder(G)
-
+    # Retrieve bonds, initialise Hasse diagram object, and add bond nodes
+    bonds = algo(G)
     hasse = nx.Graph()
     for bond in bonds:
         hasse.add_node(bond)
 
+    # Check cover relations and add edges if cover relations satisfied
     for bond in bonds:
         for bondd in bonds:
             verdict = cover_check(bond, bondd)
             if verdict == True and weight == False:
                 hasse.add_edge(bond, bondd)
 
+            # Add weighted edge if required
             elif verdict == True and weight == True:
                             hasse.add_edge(
                                 bond, bondd,
@@ -89,25 +109,42 @@ def hasse_creator(G, weight=False):
 def partition_meet(p_1, p_2):
 
     """
-        Takes the partition meet of two partitions p_1 and p_2, each defined as a frozen set of
-        frozen sets.
+        Takes the partition meet of two partitions.
+
+        Inputs:
+        p_1, p_2 - partitions (both frozensets of frozensets)
+
+        Outputs:
+        meet - the partition meet of p_1 and p_2 (frozenset of frozensets)
     """
 
     meet_list = []
 
+    # Check all intersections of blocks in p_1 and p_2, keeping only those that are non-empty
     for b_1 in p_1:
         for b_2 in p_2:
-            inter = set(b_1).intersection(set(b_2))
+            inter = b_1.intersection(b_2)
             if len(inter) != 0: 
-                meet_list.append(list(inter))
+                meet_list.append(inter)
 
-    return frozenset(frozenset(block) for block in meet_list)
+    # Ensuring output as frozenset of frozensets
+    meet = frozenset(block for block in meet_list)
+
+    return meet
 
 def bond_meet(p_1, p_2, G, algo):
 
     """
-        Finds the bond meet of two bonds p_1 and p_2. This is the greatest bond partition that refines
-        both p_1 and p_2. algo is the chosen bond-finding algorithm.
+        Finds the bond meet of two bonds p_1 and p_2. This is the greatest bond partition that 
+        refines both p_1 and p_2. 
+
+        Inputs:
+        p_1, p_2 - partitions (both frozensets of frozensets).
+        G - the graph (NetworkX object).
+        algo - the chosen bond-finding algorithm.
+
+        Outputs:
+        meet - the bond meet of p_1 and p_2 (frozenset of frozensets).
     """
     
     # Get bonds and initialise refinement candidate list
@@ -135,7 +172,9 @@ def bond_meet(p_1, p_2, G, algo):
 
    # The greatest lower bound will always be at the end of the list because bonds is sorted rank order
    # and this must be unique
-    return candidates[-1]
+    meet = candidates[-1]
+
+    return meet
 
 def partition_sublattice_checker(G, algo):
 
@@ -143,6 +182,13 @@ def partition_sublattice_checker(G, algo):
         Checks whether the bond lattice of a graph G is a sublattice of the partition lattice, by
         checking whether the partition meet of all bond pairs is in the bond lattice (closed under
         partition meet).
+
+        Inputs:
+        G - the graph (NetworkX object).
+        algo - the chosen bond-finding algorithm.
+
+        Outputs:
+        False if any partition meet of bonds does not define a bond. Otherwise true
     """
 
     bonds = algo(G)
