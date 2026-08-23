@@ -39,7 +39,10 @@ def bond_viewer(bond):
         prints the bond in the nice format, just numbers with midlines separating the blocks.
     """
 
+    # Sort the bond's blocks in order of the smallest element in each block
     blocks = sorted(bond, key=min)
+
+    # Correctly formatted and print
     formatted = " | ".join(
         " ".join(str(v) for v in sorted(block))
         for block in blocks
@@ -56,6 +59,18 @@ def bond_sorter(bonds, n):  # try and work out if possible to do this without ne
     return sorted(bonds, key=lambda pi: n - len(pi))
 
 def sort_key(bond):
+
+    """
+        Key function for sorting bonds
+
+        Input:
+        bond - frozenset of frozensets
+
+        Output:
+        (-len(blocks, blocks)) - tuple with the negative number of blocks (for sorting from 
+        finest to coarsest), and the bond itself, sorted lexicographically
+    """
+
     blocks = sorted(sorted(block) for block in bond)
     return (-len(blocks), blocks)
 
@@ -64,6 +79,15 @@ def brute_force_bond_finder(G, nice_format_view=False):
     """
         Finds all vertex partitions that define bonds of the graph G. Does this by brute force,
         computing every possible partition of the set and checking whether this defines a bond
+
+        Inputs:
+        G - the graph
+        nice_format_view - for presentation purposes, will output the bonds in order from
+                            finest to coarsest, formatted nicely
+
+        Outputs:
+        if nice_format_view == True - prints the bonds in rank order formatted nicely
+        else - returns the bonds as a list of frozensets of frozensets
     """
 
     # All partitions of the vertices
@@ -75,11 +99,13 @@ def brute_force_bond_finder(G, nice_format_view=False):
         verdict = bond_checker(G, p)
         if verdict == True:
             bonds.append(frozenset(frozenset(block) for block in p)) # turn blocks and partitions into frozenset of frozensets
-            
+
+    # If we just want to present the bonds we format them nicely and print here
     if nice_format_view == True:
         for bond in sorted(bonds, key=sort_key):
             bond_viewer(bond)
 
+    # If we actually want to use the bonds for further operation we use this
     else:
         return bond_sorter(bonds, G.number_of_nodes())
 
