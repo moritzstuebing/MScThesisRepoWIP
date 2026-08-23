@@ -54,9 +54,12 @@ def bond_sorter(bonds, n):  # try and work out if possible to do this without ne
     
     """
         Sorts bonds by rank (number of blocks) order
+
+        Inputs:
+        bonds - the bonds (list of frozensets of frozensets)
     """
     
-    return sorted(bonds, key=lambda pi: n - len(pi))
+    return sorted(bonds, key=lambda pi: - len(pi))
 
 def sort_key(bond):
 
