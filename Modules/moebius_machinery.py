@@ -1,84 +1,84 @@
-from Modules.next_closure_bond_finder import next_closure_algo
+from Modules.brute_force_bond_finder import *
 import numpy as np
 
-# Needed for well-defined set inclusion for partitions
-def set_maker(pi):
+def zeta_matrix(G, algo):
 
     """
-        Turns a list of lists into a frozen set of a frozen sets.
-    """
+        Calculates the zeta matrix of bond lattice for any graph.
 
-    return frozenset(frozenset(block) for block in pi)
+        Inputs:
+        G - the graph (NetworkX object).
+        algo - the chosen bond-finding algorithm.
 
-def zeta_matrix(partitions):
-
-    """
-        Calculates the zeta matrix for any partition lattice or sublattice, ordered by refinement
+        Outputs:
+        zeta - matrix (2D np.array) where i,j entry = 1 if i'th bond refines j, 0 otherwise.
     """
 
     # Automatically non-singular since upper triangular
 
-    # Turn partitions and blocks within partitions into frozen sets so that set inclusion operations work
-    bonds = [set_maker(pi) for pi in partitions]
-
+    # Retrieve bonds
+    bonds = algo(G)
     # Get number of bonds and initialise zeta matrix
-    n = len(partitions)
-    zeta = np.zeros((n, n))
+    zeta = np.zeros((len(bonds), len(bonds)))
 
     # Refinement check / filling in zeta matrix
     for i, pi in enumerate(bonds):
-        for j, sigma in enumerate(bonds): # can possibly simplify further by working out how many bonds at each rank, then checking less bonds
+        for j, sigma in enumerate(bonds):
             verdict = all(any(b <= B for B in sigma) for b in pi)
-            #print(pi, sigma, verdict)
             if verdict == True:
                 zeta[i, j] = 1
 
     return zeta
 
-def full_inv_mu(partitions):
+def full_inv_mu(G, algo):
 
     """
-        For a given set of partitions in refinement order, calculates the zeta and moebius matrices, 
-        and returns the required Moebius coefficients.
+        For a given graph G, calculates Moebius coefficients.
+
+        Inputs:
+        G - the graph (NetworkX object).
+        algo - the chosen bond-finding algorithm.
+
+        bonds - the bonds of G (list of frozensets of frozensets).
+        zeta - the zeta matrix (2D np.array) of L_G.
+        mu_mat - the mu matrix (2D np.array) of L_G, inverse of zeta.
+        mu_values - the Moebius coefficients we are interested in, correspond to intervals from
+                    each bond to the top of the lattice.
     """
 
-    zeta = zeta_matrix(partitions)
+    # Retrieve bonds and form zeta matrix
+    bonds = algo(G)
+    zeta = zeta_matrix(G, algo)
+
+    # Form mu matrix via inversion
     mu_mat = np.linalg.inv(zeta)
+
+    # Extract required Moebius coefficients for our purposes
     mu_values = mu_mat[:, -1]
 
-    return partitions, zeta, mu_mat, mu_values
+    return bonds, zeta, mu_mat, mu_values
 
-def full_inv_mu_graph(G):
-
-    """
-        For a specified graph G, finds the bonds ordered by refinement, calculates the zeta matrix, calculates the moebius
-        matrix by inversion, extracts the required moebius coefficients
-    """
-    bonds = next_closure_algo(G)
-
-    return full_inv_mu(bonds)
-
-def mat_vec_solve_mu(partitions):
+def mat_vec_solve_mu(G, algo):
     
     """
-        For some set of partitions in refinement order, calculates the zeta matrix, and returns the required Moebius
-        coefficients by a matrix-vector solve
+        For some graph, returns required Moebius coefficients via a matrix-vector system solve.
+
+        Inputs:
+        G - the graph (NetworkX object)
+        algo - the chosen bond-finding algorithm
+
+        Outputs:
+        bonds - the bonds of G (list of frozensets of frozensets)
+        zeta - the zeta matrix (2D np.array)
+        mu_values - the required Moebius coefficients for our purposes
     """
 
-    zeta = zeta_matrix(partitions)
-    e = np.zeros(len(partitions)); e[len(partitions) - 1] = 1
+    # Retrieve bonds and form zeta matrix
+    bonds = algo(G)
+    zeta = zeta_matrix(G, algo)
+
+    # Form canonical basis vector and solve matrix-vector system
+    e = np.zeros(len(bonds)); e[len(bonds) - 1] = 1
     mu_values = np.linalg.solve(zeta, e)
 
-    return partitions, zeta, mu_values
-
-def mat_vec_mu_graph(G, algo):
-
-    
-    """
-        For a specified graph G, finds the bonds ordered by refinement, calculates the zeta matrix, extracts the required 
-        moebius coefficients by a matrix-vector solve.
-    """
-
-    bonds = algo(G)
-
-    return mat_vec_solve_mu(bonds)
+    return bonds, zeta, mu_values

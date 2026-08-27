@@ -4,8 +4,6 @@ import itertools
 from Modules.brute_force_bond_finder import brute_force_bond_finder
 from Modules.moebius_machinery import mat_vec_solve_mu
 
-### Covariance and gaussian generator never actually used
-
 def covariance_matrix_graph(G, rho):
 
     """
@@ -142,7 +140,7 @@ def analytic_gaussian_bi(G, algo, sigma, alpha=0.5):
 
     # Get bonds and moebius coefficients
     bonds = algo(G)
-    _, _, mu = mat_vec_solve_mu(bonds)
+    _, _, mu = mat_vec_solve_mu(G, algo)
 
     # Initialise running sum
     bi = 0.0

@@ -1,9 +1,8 @@
 import numpy as np
-from Modules.moebius_machinery import mat_vec_mu_graph
-
-# Taken from Tim's repo
+from Modules.moebius_machinery import mat_vec_solve_mu
 
 def shuffle_data(data, shuffle_indices):
+    # Taken from repo https://github.com/barahona-research-group/streitberg-information
     # Create a copy of the original data to avoid modifying the input in place.
     shuffled_data = data.copy()
 
@@ -49,12 +48,12 @@ def bond_information(G, X, div, algo):
         Calculates the bond information from a dataset and graph prior.
 
         Inputs:
-        G - graph structure of the data (NetworkX graph object)
+        G - the graph (NetworkX object)
         X - dataset
     """
 
     # Retreive bonds and calculate the mu coefficients of the given graph
-    bonds, _, mu = mat_vec_mu_graph(G, algo)
+    bonds, _, mu = mat_vec_solve_mu(G, algo)
     divs = np.zeros(len(bonds))
 
     # Check that shapes match

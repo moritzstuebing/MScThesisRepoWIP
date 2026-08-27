@@ -49,18 +49,6 @@ def bond_viewer(bond):
     )
     print(formatted)
 
-
-def bond_sorter(bonds, n):  # try and work out if possible to do this without needing n input, purely working out number of nodes n from the bonds
-    
-    """
-        Sorts bonds by rank (number of blocks) order
-
-        Inputs:
-        bonds - the bonds (list of frozensets of frozensets)
-    """
-    
-    return sorted(bonds, key=lambda pi: - len(pi))
-
 def sort_key(bond):
 
     """
@@ -76,6 +64,21 @@ def sort_key(bond):
 
     blocks = sorted(sorted(block) for block in bond)
     return (-len(blocks), blocks)
+
+
+def bond_sorter(bonds):  # try and work out if possible to do this without needing n input, purely working out number of nodes n from the bonds
+    
+    """
+        Sorts bonds by rank (number of blocks) order
+
+        Inputs:
+        bonds - the bonds (list of frozensets of frozensets)
+
+        Outputs:
+        Sorted bonds list by rank order
+    """
+    
+    return sorted(bonds, key= sort_key)
 
 def brute_force_bond_finder(G, nice_format_view=False):
 
@@ -110,7 +113,7 @@ def brute_force_bond_finder(G, nice_format_view=False):
 
     # If we actually want to use the bonds for further operation we use this
     else:
-        return bond_sorter(bonds, G.number_of_nodes())
+        return bond_sorter(bonds)
 
 
 
