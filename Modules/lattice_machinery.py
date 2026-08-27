@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 from math import log2
-from Modules.brute_force_bond_finder import brute_force_bond_finder, bond_sorter
+from Modules.bond_finders import brute_force_bond_finder, bond_sorter
 
 def partition_entropy(partition):
 
