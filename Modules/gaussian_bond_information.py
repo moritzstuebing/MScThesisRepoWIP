@@ -1,7 +1,7 @@
 import numpy as np
 import networkx as nx
 import itertools
-from Modules.brute_force_bond_finder import brute_force_bond_finder
+from Modules.bond_finders import *
 from Modules.moebius_machinery import mat_vec_solve_mu
 
 def covariance_matrix_graph(G, rho):

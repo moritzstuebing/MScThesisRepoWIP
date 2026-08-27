@@ -1,4 +1,3 @@
-from Modules.brute_force_bond_finder import *
 import numpy as np
 
 def zeta_matrix(G, algo):
