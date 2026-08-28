@@ -124,7 +124,7 @@ def restrict(sigma, bond):
 def analytic_gaussian_bi(G, algo, sigma, alpha=0.5):
 
     """
-        Finds the analytic Gaussian bond information. Workas because TA divergence has a closed
+        Finds the analytic Gaussian bond information. Works because TA divergence has a closed
         form on Gaussian data.
 
         Inputs:

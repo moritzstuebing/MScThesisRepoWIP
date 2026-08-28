@@ -1,6 +1,15 @@
 # The Bond Lattice: Structure and Information Measures
 
-This repository develops codes to analyse the Bond Lattice, as well as information-theoretic measures derived from it. All graph-theoretic requirements use NetworkX. The Modules folder provides scripts that include useful functions, and the Notebooks folder contains Jupyter notebook experiments and calculations to analyse the behaviours of the lattice and associated information measures. We now give a brief overview of each Modules file. For deeper explanations, check the docstrings and comments in corresponding scripts.
+This repository develops codes to analyse the Bond Lattice for any graph, and information-theoretic measures derived from it. All graph-theoretic requirements use NetworkX. The Modules folder provides scripts that include useful functions, and the Notebooks folder contains Jupyter notebook experiments and calculations to analyse the behaviours of the lattice and associated information measures. The Notebooks are numbered in the order that the corresponding figures/results appear in the report, and include descriptions of all computations done to achieve these results. We now give a brief overview of each Modules file. For deeper explanations, check the docstrings and comments in corresponding scripts.
+
+## Installation
+
+Developed with Python 3.13. From repository root, install the dependencies and the package (editable install) with:
+
+    pip install -r requirements.txt
+    pip install -e .
+
+Run the examples and notebooks from the repository root.
 
 ## Modules
 
