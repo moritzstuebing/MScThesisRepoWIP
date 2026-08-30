@@ -156,50 +156,32 @@ def edge_bond_finder(G):
     # Sort the bonds
     return bond_sorter(bonds)
 
-def merger(G, edges):
+def merger(G, bond):
 
     """
-        Given a graph and an edge set, produces all edge sets that merge two components.
+        Given a graph and a bond, produces all bonds that merge two components.
 
         Inputs:
         G - the graph (NetworkX object)
-        edges - the edge set to find resulting merged edge subsets from (list of tuples)
+        bond - frozenset of frozensets indicating the bond to be expanded
 
         Outputs:
-        tuples - list of tuples of each resulting edge set and corresponding bond
+        next_bonds - 
     """
 
-    # Form spanning subgraph given edges, retrieve nodes of the connected components, and initialise
-    # list
-    subgraph = G.copy()
-    subgraph.remove_edges_from(list(set(G.edges()) - set(edges)))
-    component_nodes = [nodes for nodes in nx.connected_components(subgraph)]
-    bonds = set()
-    tuples = []
+    block_of = {v: block for block in bond for v in block}
+    next_bonds = set()
 
     # Loop over all edges in G
     for edge in G.edges():
 
-        # Check if the edge connects separate components of the spanning subgraph (if one endpoint is
-        # in a given component and the other isn't, this edge must connect separate components)
-        verdict = (
-            any(edge[0] in nodes and edge[1] not in nodes for nodes in component_nodes)
-        )
+        bu, bv = block_of[edge[0]], block_of[edge[1]]
 
-        # If edge connects separate components, form another subgraph from spanning subgraph with
-        # just this edge added, and retrieve the given bond and edge subset, adding to lists
-        if verdict is True:
-            edge_subgraph = subgraph.copy()
-            edge_subgraph.add_edge(edge[0], edge[1])
-            bond = frozenset(frozenset(nodes) for nodes in nx.connected_components(edge_subgraph))
+        if bu != bv:
+            merged = bu | bv
+            next_bonds.add((bond - {bu, bv}) | {merged})
 
-            # Ensure we dont add any duplicated bonds or corresponding edge subsets
-            if bond not in bonds:
-                tuples.append((bond, [e for e in edge_subgraph.edges()]))
-                bonds.add(bond)
-
-
-    return tuples
+    return next_bonds
 
 def walk_bond_finder(G):
 
@@ -215,19 +197,21 @@ def walk_bond_finder(G):
 
     # Bonds set (needs a set to check for previously visited bonds later) and wait_list for edge sets
     # waiting to be expanded
-    bonds = {frozenset(frozenset([i]) for i in range(G.number_of_nodes()))}
-    wait_list = deque([[]])
+    hat_zero = frozenset(frozenset([i]) for i in range(G.number_of_nodes()))
+    bonds = {hat_zero}
+    wait_list = deque([hat_zero])
 
     while wait_list:  # while non-empty
 
         # Extract left-most edge subset and find all edge subsets resulting from merging connected
         # components of graph given by this edge subset
-        edges = wait_list.popleft()
-        tuples = merger(G, edges)
+        bond = wait_list.popleft()
+        children = merger(G, bond)
 
-        # Add edge subsets to wait list and bonds to bonds set only if the bond has not been seen
-        wait_list.extend(edge_set for (bond, edge_set) in tuples if bond not in bonds)
-        bonds.update(bond for (bond, _) in tuples if bond not in bonds)
+        for child in children:
+            if child not in bonds:
+                bonds.add(child)
+                wait_list.append(child)
     
     # bond_sorter returns a list
     return bond_sorter(bonds)

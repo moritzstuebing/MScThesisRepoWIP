@@ -203,3 +203,25 @@ def partition_sublattice_checker(G, algo):
                 return False
 
     return True
+
+def is_block_graph(G):
+
+    """
+        Checks if a graph is a block graph by checking that all biconnected components are cliques.
+
+        Inputs:
+        G - the graph (NetworkX object)
+
+        Outputs:
+        True/False - verdict of whether or not the graph is a block graph
+    """
+
+    if G.number_of_nodes() <= 1:
+        return True
+
+    for bi_comp in nx.biconnected_components(G):
+        subgraph = G.subgraph(bi_comp)
+        k = len(bi_comp)
+        if subgraph.number_of_edges() != k * (k - 1) // 2:  # is it a clique?
+            return False
+    return True
