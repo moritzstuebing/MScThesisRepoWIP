@@ -226,7 +226,7 @@ def factorised_bi(G, algo, rho):
     for bond in sep_list[:len(bonds)]:
 
         # Covariance to induce joint factorisation according to current bond
-        sigma = covariance_matrix_bond(G, bond, rho)
+        sigma = covariance_matrix_bond(bond, rho)
 
         # Calculate and add to dictionary
         bond_facts[bond] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
@@ -235,7 +235,7 @@ def factorised_bi(G, algo, rho):
 
         # Covariance to induce joint factorisation according to current bond. Correlation strength between 
         # dependent variables = 0.99
-        sigma = covariance_matrix_bond(G, part, rho)
+        sigma = covariance_matrix_bond(part, rho)
         
         # Calculate and add to dictionary
         nonbond_facts[part] = (analytic_gaussian_bi(G, brute_force_bond_finder, sigma))
