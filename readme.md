@@ -9,8 +9,6 @@ Developed with Python 3.13. From repository root, install the dependencies and t
     pip install -r requirements.txt
     pip install -e .
 
-Run the examples and notebooks from the repository root.
-
 ## Modules
 
 #### bond_finders
@@ -18,9 +16,6 @@ Contains three algorithms of varying computational complexity, to find all bonds
 
 #### gaussian_bond_information
 Contains functions required to compute the Bond Information for Gaussian data, which has an analytic form.
-
-#### general_bond_information
-Contains a Bond Information function that can be used for any dataset with a graph structure.
 
 #### lattice_machinery
 Contains lattice-theoretic functions. The Hasse creation function with weights is used to compute the Bond Variation of Information.
@@ -60,7 +55,7 @@ print(f"Bond Information of fully-dependent data: {bi:.4f}")
 
 bond = bonds[4] # choosing arbitrary bond
 print(bond)
-sigma_bond = covariance_matrix_bond(P_5, bond, rho) # bond-induced covariance
+sigma_bond = covariance_matrix_bond(bond, rho) # bond-induced covariance
 bi_fact = analytic_gaussian_bi(P_5, brute_force_bond_finder, sigma_bond)
 print(f"Bond Information of factorised data: {bi_fact:.4f}")
 

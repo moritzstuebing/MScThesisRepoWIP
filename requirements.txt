@@ -2,4 +2,5 @@ matplotlib==3.11.1
 more_itertools==11.1.0
 networkx==3.3
 numpy==2.5.2
-scipy==1.18.1
+seaborn==0.13.2
+ipykernel==7.3.0
