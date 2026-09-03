@@ -32,13 +32,12 @@ def covariance_matrix_graph(G, rho):
     return cov
 
 
-def covariance_matrix_bond(G, bond, rho):
+def covariance_matrix_bond(bond, rho):
 
     """
         Generates the covariance matrix respecting the factorisation structure of a given bond.
 
         Inputs:
-        G - the graph.
         bond - the given bond that the covariance matrix's dependence structure should respect.
         rho - correlation strength between dependent variables.
 
@@ -47,7 +46,8 @@ def covariance_matrix_bond(G, bond, rho):
     """
 
     # Initialise array for covariance
-    sigma = np.zeros((len(list(G.nodes)), len(list(G.nodes))))
+    d = sum([1 for block in bond for b in block])
+    sigma = np.zeros((d, d))
 
     # Loop over all blocks
     for block in bond:
@@ -61,7 +61,7 @@ def covariance_matrix_bond(G, bond, rho):
                 sigma[pair[0], pair[1]] = rho
                 sigma[pair[1], pair[0]] = rho
 
-    for i in range(len(list(G.nodes))):
+    for i in range(d):
         sigma[i, i] = 1
 
     return sigma
@@ -216,7 +216,6 @@ def factorised_bi(G, algo, rho):
     """
 
     # Get bonds and separated list of bonds / non-bonds
-    d = len(G.nodes)
     bonds, _, sep_list = bond_nonbond_list_maker(G, algo)
 
     # Initialise dictinaries for value storing
